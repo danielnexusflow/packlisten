@@ -171,10 +171,9 @@ def try_to_place_box(box, pallet):
     return placed, dimensions
 
 
-def bigger_or_new_pallet(current_pallet, box, result):
+def bigger_or_new_pallet(pallets, current_pallet, box, result):
     # Try to find a bigger pallet
-    next_bigger_pallet = find_next_bigger_pallet(
-        pallets, current_pallet)
+    next_bigger_pallet = find_next_bigger_pallet(pallets, current_pallet)
 
     # If there is a next bigger pallet, check if the box fits there
     if next_bigger_pallet:
@@ -186,7 +185,8 @@ def bigger_or_new_pallet(current_pallet, box, result):
         if placed:
             return placed, next_bigger_pallet
         else:
-            even_bigger = bigger_or_new_pallet(next_bigger_pallet, box, result)
+            even_bigger = bigger_or_new_pallet(
+                pallets, next_bigger_pallet, box, result)
 
             if even_bigger:
                 return even_bigger
@@ -209,7 +209,7 @@ def optimize_pallets_ordered(pallets: List[Pallet], boxes: List[Box]) -> List[Di
     # Expand boxes into individual instances
     box_queue = []
     for box in boxes:
-        for _ in range(box.quantity):
+        for _ in range(int(box.quantity)):
             box_queue.append(box)
 
     # Sort boxes by type (round first) and then by descending weight and volume
@@ -244,7 +244,8 @@ def optimize_pallets_ordered(pallets: List[Pallet], boxes: List[Box]) -> List[Di
 
             if not placed:
                 placed, current_pallet = bigger_or_new_pallet(
-                    current_pallet, box, result)
+                    pallets, current_pallet, box, result
+                )
 
     finish_pallet(current_pallet=current_pallet, result=result)
 
@@ -252,24 +253,24 @@ def optimize_pallets_ordered(pallets: List[Pallet], boxes: List[Box]) -> List[Di
 
 
 # Example Usage
-pallets = [
-    Pallet(120, 80, 105, own_weight=22, max_weight=478, type_id=2),
-    Pallet(220, 40, 60, own_weight=11, max_weight=289, type_id=1),
-    Pallet(220, 80, 105, own_weight=20, max_weight=680, type_id=3),
-    Pallet(220, 80, 105, own_weight=30, max_weight=770, type_id=4)
-]  # Initialize with one pallet
-boxes = [
-    Box(213, 16, 13, weight=19, quantity=10,
-        shape='rectangular', type_id=4, can_rotate=False),
-    # Box(212, 18, 16, weight=22, quantity=14, shape='rectangular'),
-    # Box(145, 20, 20, weight=60, quantity=10, shape='round'),
-    Box(230, 23, 23, weight=133, quantity=8, shape='round', overage=20)
-]
+# pallets = [
+#     Pallet(120, 80, 105, own_weight=22, max_weight=478, type_id=2),
+#     Pallet(220, 40, 60, own_weight=11, max_weight=289, type_id=1),
+#     Pallet(220, 80, 105, own_weight=20, max_weight=680, type_id=3),
+#     Pallet(220, 80, 105, own_weight=30, max_weight=770, type_id=4)
+# ]  # Initialize with one pallet
+# boxes = [
+#     Box(213, 16, 13, weight=19, quantity=10,
+#         shape='rectangular', type_id=4, can_rotate=False),
+#     # Box(212, 18, 16, weight=22, quantity=14, shape='rectangular'),
+#     # Box(145, 20, 20, weight=60, quantity=10, shape='round'),
+#     Box(230, 23, 23, weight=133, quantity=8, shape='round', overage=20)
+# ]
 
-placements = optimize_pallets_ordered(pallets, boxes)
+# placements = optimize_pallets_ordered(pallets, boxes)
 
-output_file = "pallet_placements.json"
-with open(output_file, "w") as file:
-    json.dump(placements, file, indent=4)
+# output_file = "pallet_placements.json"
+# with open(output_file, "w") as file:
+#     json.dump(placements, file, indent=4)
 
-print(f"Placements saved to {output_file}")
+# print(f"Placements saved to {output_file}")
