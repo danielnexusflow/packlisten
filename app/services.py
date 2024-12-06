@@ -243,9 +243,21 @@ def optimize_pallets_ordered(pallets: List[Pallet], boxes: List[Box]) -> List[Di
             box.width, box.depth, box.height = dimensions
 
             if not placed:
-                placed, current_pallet = bigger_or_new_pallet(
+                bigger = bigger_or_new_pallet(
                     pallets, current_pallet, box, result
                 )
+                
+                if bigger:
+                    placed, current_pallet = bigger
+                else:
+                    # Add the current pallet to the result if it contains any items
+                    finish_pallet(current_pallet=current_pallet, result=result)
+
+                    # No bigger pallet available, add a new one
+                    new_pallet = add_new_pallet_of_type(
+                        pallets, pallets[0].type_id)
+                    pallets.append(new_pallet)
+                    current_pallet = new_pallet
 
     finish_pallet(current_pallet=current_pallet, result=result)
 
