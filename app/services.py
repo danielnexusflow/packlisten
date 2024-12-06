@@ -272,7 +272,7 @@ def optimize_pallets_ordered(pallets: List[Pallet], boxes: List[Box]) -> List[Di
 #     Pallet(220, 80, 105, own_weight=30, max_weight=770, type_id=4)
 # ]  # Initialize with one pallet
 # boxes = [
-#     Box(213, 16, 13, weight=19, quantity=10,
+#     Box(213, 16, 13, weight=4.75, quantity=10,
 #         shape='rectangular', type_id=4, can_rotate=False),
 #     # Box(212, 18, 16, weight=22, quantity=14, shape='rectangular'),
 #     # Box(145, 20, 20, weight=60, quantity=10, shape='round'),

@@ -5,7 +5,7 @@ class BoxModel(BaseModel):
     width: int
     depth: int
     height: int
-    weight: int
+    weight: float
     quantity: int
     shape: str = 'rectangular'
     can_rotate: bool = True
@@ -16,6 +16,6 @@ class PalletModel(BaseModel):
     width: int
     depth: int
     height: int
-    own_weight: int
-    max_weight: int
+    own_weight: float
+    max_weight: float
     type_id: int
