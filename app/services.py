@@ -1,4 +1,5 @@
 import json
+import logging
 from typing import List, Dict, Tuple
 
 
@@ -29,15 +30,18 @@ class Pallet:
     def can_place_box(self, x, y, z, box):
         # Check if box fits within the pallet dimensions considering overage
         if x + box.width > self.width + box.overage or y + box.depth > self.depth or z + box.height > self.height:
+            logging.info('Box does not fit on pallet because it is too big (for the available space)')
             return False
 
         # Check if box exceeds weight capacity
         if self.current_weight + box.weight > self.max_weight:
+            logging.info('Box does not fit on pallet because it is too heavy (for the available weight)')
             return False
 
         # Check for overlaps with already placed boxes
         for placed_box in self.used_space:
             if self.boxes_overlap(x, y, z, box, placed_box):
+                logging.info('Box does not fit on pallet because it overlaps with another pallet.')
                 return False
 
         return True
@@ -231,6 +235,8 @@ def optimize_pallets_ordered(pallets: List[Pallet], boxes: List[Box]) -> List[Di
         if box.shape == 'rectangular' and round_object_count > 2:
             # Add the current pallet to the result and create a new one
             finish_pallet(current_pallet=current_pallet, result=result)
+            logging.info(
+                f'Added new pallet because a rectangular box was tried to be added to a pallet containing {round_object_count} rounds objects')
             new_pallet = add_new_pallet_of_type(pallets, pallets[0].type_id)
             pallets.append(new_pallet)
             current_pallet = new_pallet
@@ -246,7 +252,7 @@ def optimize_pallets_ordered(pallets: List[Pallet], boxes: List[Box]) -> List[Di
                 bigger = bigger_or_new_pallet(
                     pallets, current_pallet, box, result
                 )
-                
+
                 if bigger:
                     placed, current_pallet = bigger
                 else:
@@ -265,24 +271,24 @@ def optimize_pallets_ordered(pallets: List[Pallet], boxes: List[Box]) -> List[Di
 
 
 # Example Usage
-# pallets = [
-#     Pallet(120, 80, 105, own_weight=22, max_weight=478, type_id=2),
-#     Pallet(220, 40, 60, own_weight=11, max_weight=289, type_id=1),
-#     Pallet(220, 80, 105, own_weight=20, max_weight=680, type_id=3),
-#     Pallet(220, 80, 105, own_weight=30, max_weight=770, type_id=4)
-# ]  # Initialize with one pallet
-# boxes = [
-#     Box(213, 16, 13, weight=4.75, quantity=10,
-#         shape='rectangular', type_id=4, can_rotate=False),
-#     # Box(212, 18, 16, weight=22, quantity=14, shape='rectangular'),
-#     # Box(145, 20, 20, weight=60, quantity=10, shape='round'),
-#     Box(230, 23, 23, weight=133, quantity=8, shape='round', overage=20)
-# ]
+pallets = [
+    Pallet(120, 80, 105, own_weight=22, max_weight=478, type_id=2),
+    Pallet(220, 40, 60, own_weight=11, max_weight=289, type_id=1),
+    Pallet(220, 80, 105, own_weight=20, max_weight=680, type_id=3),
+    Pallet(220, 80, 105, own_weight=30, max_weight=770, type_id=4)
+]  # Initialize with one pallet
+boxes = [
+    Box(213, 16, 13, weight=4.75, quantity=10,
+        shape='rectangular', type_id=4, can_rotate=False),
+    # Box(212, 18, 16, weight=22, quantity=14, shape='rectangular'),
+    # Box(145, 20, 20, weight=60, quantity=10, shape='round'),
+    Box(230, 23, 23, weight=133, quantity=8, shape='round', overage=20)
+]
 
-# placements = optimize_pallets_ordered(pallets, boxes)
+placements = optimize_pallets_ordered(pallets, boxes)
 
-# output_file = "pallet_placements.json"
-# with open(output_file, "w") as file:
-#     json.dump(placements, file, indent=4)
+output_file = "pallet_placements.json"
+with open(output_file, "w") as file:
+    json.dump(placements, file, indent=4)
 
-# print(f"Placements saved to {output_file}")
+print(f"Placements saved to {output_file}")
