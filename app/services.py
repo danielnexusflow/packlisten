@@ -28,6 +28,11 @@ class Pallet:
         self.used_space = []  # Stores placed boxes with positions and dimensions
 
     def can_place_box(self, x, y, z, box):
+        # Check if the pallet already has 30 boxes
+        if len(self.used_space) >= 30:
+            logging.info('Box does not fit on pallet because it exceeds max box count of 30')
+            return False
+        
         # Check if box fits within the pallet dimensions considering overage
         if x + box.width > self.width + box.overage or y + box.depth > self.depth or z + box.height > self.height:
             logging.info('Box does not fit on pallet because it is too big (for the available space)')
